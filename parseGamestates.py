@@ -25,7 +25,8 @@ def getGamestateById(ID):
     response = requests.get(url)
     print(url)
     print(response.status_code)
-    print()
+    time.sleep(2)
+    getGamestate(response.json())
 
 
 def getGamestate(obj):
@@ -99,9 +100,7 @@ def getGamestate(obj):
 with open('matchDatabaseBackup') as f:
     
     for matchId in f:
-
         getGamestateById(matchId[0:10])
-        time.sleep(1.5)
     f.close()
 
 

@@ -40,7 +40,7 @@ while playerQueue.empty() != True and len(matchList) <= targetVal:
 					continue;
 				playerQueue.put(newPlayer['summonerId']);
 				playerList.append(newPlayer['summonerId']);
-			print str(currGame);
+			print type(currGame);
 for match in matchList:
 	matchFile.write(match);
 matchFile.close;
