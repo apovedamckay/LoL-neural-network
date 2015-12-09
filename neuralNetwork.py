@@ -3,22 +3,23 @@ from pybrain.utilities           import percentError
 from pybrain.tools.shortcuts     import buildNetwork
 from pybrain.supervised.trainers import BackpropTrainer
 from pybrain.structure.modules   import SoftmaxLayer
+from pybrain.structure.modules   import SigmoidLayer
 from pylab import ion, ioff, figure, draw, contourf, clf, show, hold, plot
 from scipy import diag, arange, meshgrid, where
 from numpy.random import multivariate_normal
 
 # DS = ClassificationDataSet(inputdim, nb_classes=2, class_labels=[]);
-DS = ClassificationDataSet(9, nb_classes=1);
-DS.appendLinked([ 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9 ], [0]);
-DS.appendLinked([ 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.1 ], [0]);
-DS.appendLinked([ 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.1, 0.2 ], [1]);
-DS.appendLinked([ 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.1, 0.2, 0.3 ], [1]);
-DS.appendLinked([ 0.5, 0.6, 0.7, 0.8, 0.9, 0.1, 0.2, 0.3, 0.4 ], [1]);
-DS.appendLinked([ 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9 ], [0]);
-DS.appendLinked([ 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.1 ], [0]);
-DS.appendLinked([ 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.1, 0.2 ], [1]);
-DS.appendLinked([ 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.1, 0.2, 0.3 ], [1]);
-DS.appendLinked([ 0.5, 0.6, 0.7, 0.8, 0.9, 0.1, 0.2, 0.3, 0.4 ], [1]);
+DS = ClassificationDataSet(9, nb_classes=1, class_labels=["Blue team won", "Red team won"]);
+DS.appendLinked([ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ], [0]);
+DS.appendLinked([ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ], [0]);
+DS.appendLinked([ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ], [0]);
+DS.appendLinked([ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ], [0]);
+DS.appendLinked([ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ], [0]);
+DS.appendLinked([ 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 ], [0]);
+DS.appendLinked([ 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 ], [0]);
+DS.appendLinked([ 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 ], [0]);
+DS.appendLinked([ 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 ], [0]);
+DS.appendLinked([ 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 ], [0]);
 
 # means = [(-1,0),(2,4),(3,1)]
 # cov = [diag([1,1]), diag([0.5,1.2]), diag([1.5,0.7])]
@@ -40,7 +41,7 @@ print "First sample (input, target, class):"
 print trndata['input'][0], trndata['target'][0]
 # print trndata['input'][0], trndata['target'][0], trndata['class'][0]
 
-fnn = buildNetwork( trndata.indim, 5, trndata.outdim, outclass=SoftmaxLayer )
+fnn = buildNetwork( trndata.indim, 9, trndata.outdim, outclass=SigmoidLayer, hiddenclass=SigmoidLayer )
 
 trainer = BackpropTrainer( fnn, dataset=trndata, momentum=0.1, verbose=True, weightdecay=0.01)
 
@@ -53,7 +54,8 @@ trainer = BackpropTrainer( fnn, dataset=trndata, momentum=0.1, verbose=True, wei
 # griddata._convertToOneOfMany()  # this is still needed to make the fnn feel comfy
 
 for i in range(20):
-    trainer.trainEpochs( 1 )
+    trainer.trainEpochs( 5 )
+    # trainer.trainUntilConvergence();
     trnresult = percentError( trainer.testOnClassData(),
                               trndata['class'] )
     tstresult = percentError( trainer.testOnClassData(
@@ -76,6 +78,6 @@ for i in range(20):
 #         contourf(X, Y, out)   # plot the contour
 #     ion()   # interactive graphics on
 #     draw()  # update the plot
-# print DS.getField('target').transpose();
+print fnn.activate([ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ])
 # ioff()
 # show()
