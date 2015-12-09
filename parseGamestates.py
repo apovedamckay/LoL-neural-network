@@ -2,6 +2,7 @@ import json
 import requests
 from pprint import pprint
 import codecs
+import time
 
 # api_key = "44a61ade-3abb-4d3d-8c50-3aa2b6325a8d"
 # matchId = 1778933437 #1778839570 #1778942120
@@ -18,6 +19,13 @@ import codecs
 #         fd.close()
 
 
+def getGamestateById(ID):
+    api_key = "44a61ade-3abb-4d3d-8c50-3aa2b6325a8d"
+    url = "https://na.api.pvp.net/api/lol/na/v2.2/match/" + str(ID) + "?api_key=" + str(api_key) + "&includeTimeline=true"
+    response = requests.get(url)
+    print(url)
+    print(response.status_code)
+    print()
 
 
 def getGamestate(obj):
@@ -84,14 +92,16 @@ def getGamestate(obj):
         
     state['team1'] = team1
     state['team2'] = team2
-    with open('results.json', 'a') as fd:
+    with open('results2.json', 'a') as fd:
         json.dump(state, fd)
         fd.close()
 
-with open('matches3.json') as f:
-    data = json.load(f)
-    for match in data['matches']:
-        getGamestate(match)
+with open('matchDatabaseBackup') as f:
+    
+    for matchId in f:
+
+        getGamestateById(matchId[0:10])
+        time.sleep(1.5)
     f.close()
 
 
