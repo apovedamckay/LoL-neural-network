@@ -44,13 +44,13 @@ fnn = buildNetwork( trndata.indim, 5, trndata.outdim, outclass=SoftmaxLayer )
 
 trainer = BackpropTrainer( fnn, dataset=trndata, momentum=0.1, verbose=True, weightdecay=0.01)
 
-ticks = arange(-3.,6.,0.2)
-X, Y = meshgrid(ticks, ticks)
-# need column vectors in dataset, not arrays
-griddata = ClassificationDataSet(9, nb_classes=1)
-for i in xrange(X.size):
-    griddata.addSample([X.ravel()[i],Y.ravel()[i]], [0])
-griddata._convertToOneOfMany()  # this is still needed to make the fnn feel comfy
+# ticks = arange(-3.,6.,0.2)
+# X, Y = meshgrid(ticks, ticks)
+# # need column vectors in dataset, not arrays
+# griddata = ClassificationDataSet(9, nb_classes=1)
+# for i in xrange(X.size):
+#     griddata.addSample([X.ravel()[i],Y.ravel()[i]], [0])
+# griddata._convertToOneOfMany()  # this is still needed to make the fnn feel comfy
 
 for i in range(20):
     trainer.trainEpochs( 1 )
@@ -62,20 +62,20 @@ for i in range(20):
     print "epoch: %4d" % trainer.totalepochs, \
           "  train error: %5.2f%%" % trnresult, \
           "  test error: %5.2f%%" % tstresult
-    out = fnn.activateOnDataset(griddata)
-    out = out.argmax(axis=1)  # the highest output activation gives the class
-    out = out.reshape(X.shape)
-    figure(1)
-    ioff()  # interactive graphics off
-    clf()   # clear the plot
-    hold(True) # overplot on
-    for c in [0,1,2]:
-        here, _ = where(tstdata['class']==c)
-        plot(tstdata['input'][here,0],tstdata['input'][here,1],'o')
-    if out.max()!=out.min():  # safety check against flat field
-        contourf(X, Y, out)   # plot the contour
-    ion()   # interactive graphics on
-    draw()  # update the plot
-
-ioff()
-show()
+#     out = fnn.activateOnDataset(griddata)
+#     out = out.argmax(axis=1)  # the highest output activation gives the class
+#     out = out.reshape(X.shape)
+#     figure(1)
+#     ioff()  # interactive graphics off
+#     clf()   # clear the plot
+#     hold(True) # overplot on
+#     for c in [0,1,2]:
+#         here, _ = where(tstdata['class']==c)
+#         plot(tstdata['input'][here,0],tstdata['input'][here,1],'o')
+#     if out.max()!=out.min():  # safety check against flat field
+#         contourf(X, Y, out)   # plot the contour
+#     ion()   # interactive graphics on
+#     draw()  # update the plot
+# print DS.getField('target').transpose();
+# ioff()
+# show()
