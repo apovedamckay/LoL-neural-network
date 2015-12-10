@@ -8,7 +8,7 @@ import time
 
 
 def getGamestateById(ID):
-    api_key = "44a61ade-3abb-4d3d-8c50-3aa2b6325a8d"
+    api_key = "9c5a2d19-598d-489f-af61-1f24f4115946"
     url = "https://na.api.pvp.net/api/lol/na/v2.2/match/" + str(ID) + "?api_key=" + str(api_key) + "&includeTimeline=true"
     response = requests.get(url)
     print(url)
@@ -118,6 +118,7 @@ def getGamestate(obj):
     result = ""
     for i in state:
         result += (str(i) + ', ')
+    result = result[:-2]
     
 
     with open('game2.csv', 'a') as fd:
@@ -125,7 +126,7 @@ def getGamestate(obj):
         fd.close()
 
 with open('matchDatabaseBackup') as f:
-    # i = 100
+    # i = 10
     for matchId in f:
         # if i <= 0:
         #     break
