@@ -3,6 +3,7 @@ import requests
 from pprint import pprint
 import codecs
 import time
+import csv
 
 # api_key = "44a61ade-3abb-4d3d-8c50-3aa2b6325a8d"
 # matchId = 1778933437 #1778839570 #1778942120
@@ -20,7 +21,7 @@ import time
 
 
 def getGamestateById(ID):
-    api_key = "9c5a2d19-598d-489f-af61-1f24f4115946"
+    api_key = "44a61ade-3abb-4d3d-8c50-3aa2b6325a8d"
     url = "https://na.api.pvp.net/api/lol/na/v2.2/match/" + str(ID) + "?api_key=" + str(api_key) + "&includeTimeline=true"
     response = requests.get(url)
     print(url)
@@ -31,13 +32,13 @@ def getGamestateById(ID):
         print(response.headers)
         getGamestateById(ID)
     print()
-    time.sleep(2)
+    time.sleep(1.7)
 
 
 def getGamestate(obj):
     state = []
-    team1 = {'gold': 0, 'xp': 0, 'dragons': 0, 'towers': 0, 'wards': 0, 'barons': 0, 'inhibs': 0, 'red_buffs': 0, 'blue_buffs': 0}
-    team2 = {'gold': 0, 'xp': 0, 'dragons': 0, 'towers': 0, 'wards': 0, 'barons': 0, 'inhibs': 0, 'red_buffs': 0, 'blue_buffs': 0}
+    team1 = {'gold': 0, 'xp': 0, 'dragons': 0, 'towers': 0, 'wards': 0, 'barons': 0, 'inhibs': 0}
+    team2 = {'gold': 0, 'xp': 0, 'dragons': 0, 'towers': 0, 'wards': 0, 'barons': 0, 'inhibs': 0}
         
     for frame in obj["timeline"]["frames"]:
         
@@ -57,13 +58,15 @@ def getGamestate(obj):
                             elif event['monsterType'] == 'BARON_NASHOR':
                                 if event['killerId'] < 6: team1['barons'] += 1
                                 else: team2['barons'] += 1
-                            elif event['monsterType'] == 'RED_LIZARD':
-                                if event['killerId'] < 6: team1['red_buffs'] += 1
-                                else: team2['red_buffs'] += 1
-                            elif event['monsterType'] == 'BLUE_GOLEM':
-                                if event['killerId'] < 6: team1['blue_buffs'] += 1
-                                else: team2['blue_buffs'] += 1
-                            # else: pass
+                            # elif event['monsterType'] == 'RED_LIZARD':
+                            #     print('red buff')
+                            #     if event['killerId'] < 6: team1['red_buffs'] += 1
+                            #     else: team2['red_buffs'] += 1
+                            # elif event['monsterType'] == 'BLUE_GOLEM':
+                            #     print('blue buff')
+                            #     if event['killerId'] < 6: team1['blue_buffs'] += 1
+                            #     else: team2['blue_buffs'] += 1
+                            
                         elif event['eventType'] == 'BUILDING_KILL':
                             if event['buildingType'] == 'INHIBITOR_BUILDING':
                                 if event['killerId'] < 6: team1['inhibs'] += 1
@@ -115,28 +118,30 @@ def getGamestate(obj):
     comparison('wards')
     comparison('barons')
     comparison('inhibs')
-    comparison('red_buffs')
-    comparison('blue_buffs')
+    # comparison('red_buffs')
+    # comparison('blue_buffs')
 
 
     if obj['participants'][0]['stats']['winner']:
-        winner = [1]
+        winner = 1
     else:
-        winner = [-1]
+        winner = -1
 
-    result = (state,winner)
+    state.append(winner)
 
-    with open('results3.json', 'a') as fd:
-        fd.write(str(result) + '\n')
+    with open('game2.csv', 'a') as fd:
+        # fd.write(str(result) + '\n')
+        wr = csv.writer(fd, quoting=csv.QUOTE_MINIMAL)
+        wr.writerow(state)
         fd.close()
 
 with open('matchDatabaseBackup') as f:
-    i = 10
+    # i = 100
     for matchId in f:
-        if i <= 0:
-            break
+        # if i <= 0:
+        #     break
         getGamestateById(matchId[0:10])
-        i = i-1
+        # i = i-1
     f.close()
 
 
