@@ -24,19 +24,20 @@ def getGamestateById(ID):
     url = "https://na.api.pvp.net/api/lol/na/v2.2/match/" + str(ID) + "?api_key=" + str(api_key) + "&includeTimeline=true"
     response = requests.get(url)
     print(url)
-    print(response.status_code)
+    if response.status_code == 200:
+        getGamestate(response.json())
+    else:
+        print('ID ' + str(ID) + ': rate limited, retrying...')
+        print(response.headers)
+        getGamestateById(ID)
+    print()
     time.sleep(2)
-    getGamestate(response.json())
 
 
 def getGamestate(obj):
-    state = {'team1': '', 'team2': '', 'winner': ''}
+    state = []
     team1 = {'gold': 0, 'xp': 0, 'dragons': 0, 'towers': 0, 'wards': 0, 'barons': 0, 'inhibs': 0, 'red_buffs': 0, 'blue_buffs': 0}
     team2 = {'gold': 0, 'xp': 0, 'dragons': 0, 'towers': 0, 'wards': 0, 'barons': 0, 'inhibs': 0, 'red_buffs': 0, 'blue_buffs': 0}
-    if obj['participants'][0]['stats']['winner']:
-        state['winner'] = 'team1'
-    else:
-        state['winner'] = 'team2'
         
     for frame in obj["timeline"]["frames"]:
         
@@ -91,10 +92,34 @@ def getGamestate(obj):
     # for i in team2.items():
     #     print('    '+str(i))
         
-    state['team1'] = team1
-    state['team2'] = team2
-    with open('results2.json', 'a') as fd:
-        json.dump(state, fd)
+    def comparison(x):
+        if team1[x] == 0 or team2[x] == 0:
+            state.append(0)
+        else:
+            if team1[x] > team2[x]: state.append(team1[x]/team2[x])
+            else: state.append(team2[x]/team1[x]*-1)
+            
+    comparison('gold')
+    comparison('xp')
+    comparison('dragons')
+    comparison('towers')
+    comparison('wards')
+    comparison('barons')
+    comparison('inhibs')
+    comparison('red_buffs')
+    comparison('blue_buffs')
+
+
+    
+    result = [] 
+    result.append(state)
+    if obj['participants'][0]['stats']['winner']:
+        result.append([0])
+    else:
+        result.append([1])
+
+    with open('results3.json', 'w') as fd:
+        fd.write(str(result) + '\n')
         fd.close()
 
 with open('matchDatabaseBackup') as f:
