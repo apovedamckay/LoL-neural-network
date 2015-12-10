@@ -29,7 +29,7 @@ def getGamestate(obj):
         
     for frame in obj["timeline"]["frames"]:
         
-        if frame['timestamp'] < 1500000:
+        if frame['timestamp'] < 1200000:
             for (key, values) in frame.items():
                 if key == "events":
                     for event in values:
@@ -121,7 +121,7 @@ def getGamestate(obj):
     result = result[:-2]
     
 
-    with open('game2.csv', 'a') as fd:
+    with open('game1.csv', 'a') as fd:
         fd.write(result + '\n')
         fd.close()
 

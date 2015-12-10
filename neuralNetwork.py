@@ -96,7 +96,7 @@ trainer = BackpropTrainer( fnn, dataset=trndata, momentum=0.1, verbose=True, wei
 #     griddata.addSample([X.ravel()[i],Y.ravel()[i]], [0])
 # griddata._convertToOneOfMany()  # this is still needed to make the fnn feel comfy
 
-for i in range(20):
+for i in range(10):
     trainer.trainEpochs(5)
     # trainer.trainUntilConvergence();
     trnresult = percentError( trainer.testOnClassData(),
@@ -122,11 +122,17 @@ for i in range(20):
 #     ion()   # interactive graphics on
 #     draw()  # update the plot
 # print "activated with 1: "
-# print fnn.activate([ 1, 1, 1, 1, 1, 1, 1, 1, 1 ]);
-# print "activated with 0: "
-# print fnn.activate([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]);
+# print fnn.activate([ 1.05625511876, -1.01214558617, 0, 3, 1.2, 0, 0]);
+# print fnn.activate([1.01797352908, -1.0050781639, -2, 5.0, -1.06349206349, 0, 0])
+# print fnn.activate([1.10824090973, 1.15620422232, -1.0, 1.66666666667, 3.85416666667, 0, 0])
+# print fnn.activate([1.34279191994, 1.33590398725, -2, 3.5, 1.10769230769, 1, 0])
+# print fnn.activate([1.20972364381, 1.23054261441, 1, 4.0, 1.24489795918, 0, 0])
 # print "activated with -1: "
-# print fnn.activate([-1, -1, -1, -1, -1, -1, -1, -1, -1]);
+# print fnn.activate([-1.28338409646, -1.29251670478, -1, -1.2, -1.68421052632, -1, -1]);
+# print fnn.activate([-1.07603764642, -1.00516437839, -2, -1.66666666667, -1.5593220339, 0, 0] )
+# print fnn.activate([-1.29981947286, -1.15545164462, 0, -1.33333333333, -1.80434782609, 0, -1])
+# print fnn.activate([1.00849382971, -1.05156080837, -2, 1.5, 1.01754385965, 0, 0])
+# print fnn.activate([-1.49913637729, -1.40098021952, -1, -1.0, -1.07777777778, 0, -1])
 # ioff()
 # show()
 
