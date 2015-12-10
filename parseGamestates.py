@@ -3,21 +3,8 @@ import requests
 from pprint import pprint
 import codecs
 import time
-import csv
 
 # api_key = "44a61ade-3abb-4d3d-8c50-3aa2b6325a8d"
-# matchId = 1778933437 #1778839570 #1778942120
-
-# url = "https://na.api.pvp.net/api/lol/na/v2.2/match/" + str(matchId) + "?api_key=" + str(api_key) + "&includeTimeline=true"
-# response = requests.get(url)
-# print(response.status_code)
-# if response.status_code != 200:
-#     print(response.text)
-# else:
-#     obj = response.json()
-#     with open('match.json', 'wb') as fd:
-#         json.dumps(obj, fd, ensure_ascii=False)
-#         fd.close()
 
 
 def getGamestateById(ID):
@@ -128,11 +115,13 @@ def getGamestate(obj):
         winner = -1
 
     state.append(winner)
+    result = ""
+    for i in state:
+        result += (str(i) + ', ')
+    
 
     with open('game2.csv', 'a') as fd:
-        # fd.write(str(result) + '\n')
-        wr = csv.writer(fd, quoting=csv.QUOTE_MINIMAL)
-        wr.writerow(state)
+        fd.write(result + '\n')
         fd.close()
 
 with open('matchDatabaseBackup') as f:
