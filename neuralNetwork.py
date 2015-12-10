@@ -9,6 +9,8 @@ from pylab import ion, ioff, figure, draw, contourf, clf, show, hold, plot
 from scipy import diag, arange, meshgrid, where
 from numpy.random import multivariate_normal
 import csv
+import json
+import requests
 
 # DS = ClassificationDataSet(inputdim, nb_classes=2, class_labels=[]);
 DS = ClassificationDataSet(7, nb_classes=1, class_labels=["Blue team won", "Red team won"]);
@@ -127,3 +129,110 @@ for i in range(20):
 # print fnn.activate([-1, -1, -1, -1, -1, -1, -1, -1, -1]);
 # ioff()
 # show()
+
+currName = ''
+if type(currName) is int:
+	currId = str(currName);
+else:
+	IDResponse = requests.get("https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/"+ currName +"?api_key=9c5a2d19-598d-489f-af61-1f24f4115946");
+	time.sleep(1.25);
+	parsedName = currName.replace(" ","").lower()
+	currId = str(IDResponse.json()[parsedName]['id']);
+historyResponse = requests.get("https://na.api.pvp.net/api/lol/na/v1.3/game/by-summoner/"+currId+"/recent?api_key=9c5a2d19-598d-489f-af61-1f24f4115946");
+time.sleep(1.25);
+currHistory = historyResponse.json();
+for games in currHistory['games']:
+	if game['gameMode'] == "CLASSIC" and game['gameType'] == "MATCHED_GAME":
+		currGame = str(games['gameId']);
+		getGamestateById(currGame)
+
+
+def getGamestateById(ID):
+    # api_key = "9c5a2d19-598d-489f-af61-1f24f4115946"
+    api_key = "44a61ade-3abb-4d3d-8c50-3aa2b6325a8d"
+    url = "https://na.api.pvp.net/api/lol/na/v2.2/match/" + str(ID) + "?api_key=" + str(api_key) + "&includeTimeline=true"
+    response = requests.get(url)
+    # print(url)
+    if response.status_code == 200:
+        getGamestate(response.json())
+    else:
+        # print('ID ' + str(ID) + ': rate limited, retrying...')
+        # print(response.headers)
+        getGamestateById(ID)
+    # print()
+    time.sleep(1.7)
+
+
+def getGamestate(obj):
+    state = []
+    team1 = {'gold': 0, 'xp': 0, 'dragons': 0, 'towers': 0, 'wards': 0, 'barons': 0, 'inhibs': 0}
+    team2 = {'gold': 0, 'xp': 0, 'dragons': 0, 'towers': 0, 'wards': 0, 'barons': 0, 'inhibs': 0}
+        
+    for frame in obj["timeline"]["frames"]:
+        
+        if frame['timestamp'] < 1200000:
+            for (key, values) in frame.items():
+                if key == "events":
+                    for event in values:
+                        if event['eventType'] == 'WARD_PLACED':
+                            if event['creatorId'] < 6:
+                                team1['wards'] += 1
+                            else:
+                                team2['wards'] += 1
+                        elif event['eventType'] == 'ELITE_MONSTER_KILL':
+                            if event['monsterType'] == 'DRAGON':
+                                if event['killerId'] < 6: team1['dragons'] += 1
+                                else: team2['dragons'] += 1
+                            elif event['monsterType'] == 'BARON_NASHOR':
+                                if event['killerId'] < 6: team1['barons'] += 1
+                                else: team2['barons'] += 1
+                        elif event['eventType'] == 'BUILDING_KILL':
+                            if event['buildingType'] == 'INHIBITOR_BUILDING':
+                                if event['killerId'] < 6: team1['inhibs'] += 1
+                                else: team2['inhibs'] += 1
+                            elif event['buildingType'] == 'TOWER_BUILDING':
+                                if event['killerId'] < 6: team1['towers'] += 1
+                                else: team2['towers'] += 1
+            team1['gold'] = 0
+            team2['gold'] = 0
+            team1['xp'] = 0
+            team2['xp'] = 0
+            for ID in frame['participantFrames']:
+                participant = frame['participantFrames'][ID]
+                if int(ID) > 5:
+                    team2['gold'] += participant['totalGold']
+                    team2['xp'] += participant['xp']
+                else:
+                    team1['gold'] += participant['totalGold']
+                    team1['xp'] += participant['xp'] 
+        else: # after timestamp 1500000 has passed
+            break
+    def comparison(x):
+        if team1[x] == 0 and team2[x] == 0:
+            state.append(0)
+        elif team1[x] == 0:
+            state.append(team2[x]*-1)
+        elif team2[x] == 0:
+            state.append(team1[x])
+        else:
+            if team1[x] > team2[x]: state.append(float(team1[x])/team2[x])
+            else: state.append(float(team2[x])/team1[x]*-1)
+    comparison('gold')
+    comparison('xp')
+    comparison('dragons')
+    comparison('towers')
+    comparison('wards')
+    comparison('barons')
+    comparison('inhibs')
+    if obj['participants'][0]['stats']['winner']:
+        winner = 1
+    else:
+        winner = -1
+    state.append(winner)
+    result = ""
+    for i in state:
+        result += (str(i) + ', ')
+    result = result[:-2]
+    
+    
+    
