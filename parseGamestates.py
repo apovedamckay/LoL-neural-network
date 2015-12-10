@@ -20,7 +20,7 @@ import time
 
 
 def getGamestateById(ID):
-    api_key = "44a61ade-3abb-4d3d-8c50-3aa2b6325a8d"
+    api_key = "9c5a2d19-598d-489f-af61-1f24f4115946"
     url = "https://na.api.pvp.net/api/lol/na/v2.2/match/" + str(ID) + "?api_key=" + str(api_key) + "&includeTimeline=true"
     response = requests.get(url)
     print(url)
@@ -71,8 +71,11 @@ def getGamestate(obj):
                             elif event['buildingType'] == 'TOWER_BUILDING':
                                 if event['killerId'] < 6: team1['towers'] += 1
                                 else: team2['towers'] += 1
-                                
-        else: # after timestamp 1500000 has passed
+
+            team1['gold'] = 0
+            team2['gold'] = 0
+            team1['xp'] = 0
+            team2['xp'] = 0
             for ID in frame['participantFrames']:
                 participant = frame['participantFrames'][ID]
                 if int(ID) > 5:
@@ -80,7 +83,9 @@ def getGamestate(obj):
                     team2['xp'] += participant['xp']
                 else:
                     team1['gold'] += participant['totalGold']
-                    team1['xp'] += participant['xp']
+                    team1['xp'] += participant['xp'] 
+
+        else: # after timestamp 1500000 has passed
             break
 
     # for event in frame['events']:
@@ -93,11 +98,15 @@ def getGamestate(obj):
     #     print('    '+str(i))
         
     def comparison(x):
-        if team1[x] == 0 or team2[x] == 0:
+        if team1[x] == 0 and team2[x] == 0:
             state.append(0)
+        elif team1[x] == 0:
+            state.append(team2[x]*-1)
+        elif team2[x] == 0:
+            state.append(team1[x])
         else:
-            if team1[x] > team2[x]: state.append(team1[x]/team2[x])
-            else: state.append(team2[x]/team1[x]*-1)
+            if team1[x] > team2[x]: state.append(float(team1[x])/team2[x])
+            else: state.append(float(team2[x])/team1[x]*-1)
             
     comparison('gold')
     comparison('xp')
@@ -110,22 +119,24 @@ def getGamestate(obj):
     comparison('blue_buffs')
 
 
-    
-    result = [] 
-    result.append(state)
     if obj['participants'][0]['stats']['winner']:
-        result.append([0])
+        winner = [1]
     else:
-        result.append([1])
+        winner = [-1]
 
-    with open('results3.json', 'w') as fd:
+    result = (state,winner)
+
+    with open('results3.json', 'a') as fd:
         fd.write(str(result) + '\n')
         fd.close()
 
 with open('matchDatabaseBackup') as f:
-    
+    i = 10
     for matchId in f:
+        if i <= 0:
+            break
         getGamestateById(matchId[0:10])
+        i = i-1
     f.close()
 
 
